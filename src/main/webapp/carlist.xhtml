@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:sec="http://www.springframework.org/security/tags">
+<ui:composition tcarate="layout.xhtml">
+	<ui:define name="content">
+		<h:form id="carForm">
+			<p:panel header="Car Info" id="carInfoPnl">
+				<h:panelGrid columns="2">
+					<p:outputLabel for="number" value="Car number: " />
+					<p:inputText id="number" size="40"
+						value="#{carController.carUiTO.carNumber}" required="true"
+						requiredMessage="Please enter car number " />
+
+					<p:outputLabel for="carbrand" value="Brand " />
+					<p:selectOneMenu id="carbrand"
+						value="#{carController.carUiTO.brandUITO}"
+						style="width:150px" converter="#{brandConverter}">
+						<f:selectItems value="#{carController.brandUiToList}"
+							var="brandUITO" itemLabel="#{brandUITO.brandName}"
+							itemValue="#{brandUITO}" />
+
+					</p:selectOneMenu>
+					<h:commandButton value="#{carController.getActionLabel}"
+						action="#{carController.doSaveInfoCar}">
+						<f:ajax execute="carForm" render="carlist carInfoPnl" />
+					</h:commandButton>
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Car List" id="carlist">
+				<p:dataTable id="table" var="car"
+					value="#{carController.carUiToList}">
+					<p:column>
+						<f:facet name="header"># Car Id</f:facet>
+						<h:outputText value="#{car.carId}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">Car Number</f:facet>
+						<h:outputText value="#{car.carNumber}" />
+					</p:column>
+
+					<p:column>
+						<f:facet name="header">Brand </f:facet>
+						<h:outputText value="#{car.brandUITO.brandName}" />
+					</p:column>
+					<p:column id="action">
+						<f:facet name="header">Action</f:facet>
+						<h:commandLink value="Edit"
+							action="#{carController.editCar(car)}">
+							<f:ajax execute="action" render="carForm" />
+						</h:commandLink> /
+						  <sec:authorize access="hasRole('ROLE_ADMIN')">
+							<h:commandLink value="Delete"
+								action="#{carController.deleteCar(car)}">
+								<f:ajax execute="action" render="table" />
+							</h:commandLink>
+						</sec:authorize>
+					</p:column>
+
+				</p:dataTable>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>
